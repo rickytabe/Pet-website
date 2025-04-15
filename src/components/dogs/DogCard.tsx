@@ -4,29 +4,31 @@ import { Dog } from "../../types/user";
 import { useAuth } from "../../context/AuthContext";
 import { useState } from "react";
 import { removeFavorite, addFavorite } from "../../context/Favourite";
+import { useCart } from "../../context/CartContent";
+import { toast } from "react-toastify";
 
 interface DogCardProps {
   dog: Dog;
-  onAddToCart: () => void;
   isFavorite: boolean;
   onToggleFavorite: (dogId: string, isFavorite: boolean) => void;
-  postedByAdmin?: string; // Name of admin who posted
+  postedByAdmin?: string;
 }
 
 export const DogCard = ({ 
   dog, 
-  onAddToCart, 
   isFavorite, 
   onToggleFavorite,
   postedByAdmin 
 }: DogCardProps) => {
   const { user } = useAuth();
+  const { cart, addToCart, removeFromCart } = useCart();
   const [imageLoaded, setImageLoaded] = useState(false);
+  const isInCart = cart.some(item => item.id === dog.id);
 
   const handleToggleFavorite = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!user) {
-      // Optional: Redirect to login or show toast
+      toast.info("Please login to add favorites");
       return;
     }
 
@@ -38,7 +40,20 @@ export const DogCard = ({
       }
       onToggleFavorite(dog.id, !isFavorite);
     } catch (error) {
-      console.error("Error updating favorites:", error);
+      toast.error("Failed to update favorites");
+    }
+  };
+
+  const handleCartAction = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!dog.isAvailable) return;
+
+    if (isInCart) {
+      removeFromCart(dog.id);
+      toast.success(`${dog.name} removed from cart`);
+    } else {
+      addToCart(dog);
+      toast.success(`${dog.name} added to cart!`);
     }
   };
 
@@ -102,7 +117,6 @@ export const DogCard = ({
           <span>Age: {dog.age} {dog.age === 1 ? 'yr' : 'yrs'}</span>
         </div>
 
-        {/* Posted date */}
         {dog.createdAt && (
           <div className="text-xs text-gray-500 mb-3">
             Posted: {format(dog.createdAt.toDate(), 'MMM d, yyyy')}
@@ -114,18 +128,21 @@ export const DogCard = ({
             ${dog.price.toLocaleString()}
           </span>
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onAddToCart();
-            }}
+            onClick={handleCartAction}
             disabled={!dog.isAvailable}
             className={`px-4 py-2 rounded-lg transition-colors ${
               dog.isAvailable
-                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                ? isInCart
+                  ? 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+                  : 'bg-blue-600 text-white hover:bg-blue-700'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
           >
-            {dog.isAvailable ? 'Add to Cart' : 'Unavailable'}
+            {dog.isAvailable 
+              ? isInCart 
+                ? 'Remove' 
+                : 'Add to Cart'
+              : 'Unavailable'}
           </button>
         </div>
       </div>

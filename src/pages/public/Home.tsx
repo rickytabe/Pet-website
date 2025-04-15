@@ -7,7 +7,7 @@ import { Cart } from "../../components/cart/Cart";
 import { collection, getDocs, query, where, getCountFromServer, doc, onSnapshot } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import { Dog } from "../../types/user";
-import { toast } from "react-hot-toast";
+import { toast } from "react-toastify";
 import { useCart } from "../../context/CartContent";
 import { SearchBar } from "../../components/common/SearchBar";
 import { useAuth } from "../../context/AuthContext";
@@ -48,7 +48,6 @@ export const Home = ({ searchTerm, setSearchTerm }: HomeProps) => {
     return () => unsubscribe();
   }, [user]);
 
-  // Fetch total dog count for current active tab
   useEffect(() => {
     const fetchTotalCount = async () => {
       let q = query(collection(db, "dogs"));
@@ -96,9 +95,7 @@ export const Home = ({ searchTerm, setSearchTerm }: HomeProps) => {
         setDogs(filteredDogs);
         
         if (searchTerm) {
-          toast.success(`Found ${filteredDogs.length} matching dogs`, {
-            icon: '🐶',
-          });
+          toast.success(`Found ${filteredDogs.length} matching dogs`);
         }
       } catch (error) {
         toast.error("Failed to load dogs");
@@ -122,11 +119,28 @@ export const Home = ({ searchTerm, setSearchTerm }: HomeProps) => {
     );
   };
 
+  const handleAddToCart = (dog: Dog) => {
+    const isAlreadyInCart = cart.some(item => item.id === dog.id);
+    
+    if (isAlreadyInCart) {
+      return;
+    }
+    
+    // Check if cart is empty before adding
+    const wasCartEmpty = cart.length === 0;
+    addToCart(dog);
+    
+    toast.success(`${dog.name} added to cart!`);
+    
+    // Open cart if it was empty before adding
+    if (wasCartEmpty) {
+      setIsCartOpen(true);
+    }
+  };
   const cartTotal = cart.reduce((sum, item) => sum + item.price, 0);
   const tax = cartTotal * 0.07;
   const discount = cart.length >= 3 ? cartTotal * 0.1 : 0;
 
-  // Apply all filters
   const displayedDogs = (showFavorites
     ? dogs.filter(dog => favorites.includes(dog.id))
     : dogs)
@@ -222,13 +236,7 @@ export const Home = ({ searchTerm, setSearchTerm }: HomeProps) => {
                   key={dog.id}
                   dog={dog}
                   isFavorite={favorites.includes(dog.id)}
-                  onToggleFavorite={() => toggleFavorite(dog.id)}
-                  onAddToCart={() => {
-                    addToCart(dog);
-                    toast.success(`${dog.name} added to cart!`, {
-                      icon: '🛒',
-                    });
-                  }}
+                  onToggleFavorite={toggleFavorite}
                 />
               ))}
             </div>
@@ -245,3 +253,5 @@ export const Home = ({ searchTerm, setSearchTerm }: HomeProps) => {
     </>
   );
 };
+
+
