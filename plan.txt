@@ -1,0 +1,12 @@
+Finish implementing the live search functionality (5 mins)
+Quickly implement Network error display functionality for forms and UI
+Start working on user specific features,
+ 1) Enhance cart, let the cart dynamically open when the user adds a first element to
+   their cart
+ 2) Enhance the cart with button change when the user adds that dog to their Cart
+ 3) Enhance cart section with a checkout button and other calculations
+ 4) Work on the user Account 
+    i)Change the Layout to a sidebar , with tabs like, Profile, Setings, Order status
+    ii) Profile for Viewing updating and deleting user Info, and a logout functionality
+ 5) Add home link to navbar and implement styling of currently active link
+ 
