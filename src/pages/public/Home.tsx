@@ -27,7 +27,7 @@ export const Home = ({ searchTerm, setSearchTerm }: HomeProps) => {
   const [totalResults, setTotalResults] = useState(0);
   const [showFavorites, setShowFavorites] = useState(false);
   const [favorites, setFavorites] = useState<string[]>([]);
-  const { cart, addToCart } = useCart();
+  const { cart } = useCart();
   const { user } = useAuth();
   const [priceFilter, setPriceFilter] = useState<{ min?: number; max?: number }>({});
 
@@ -119,24 +119,24 @@ export const Home = ({ searchTerm, setSearchTerm }: HomeProps) => {
     );
   };
 
-  const handleAddToCart = (dog: Dog) => {
-    const isAlreadyInCart = cart.some(item => item.id === dog.id);
+  // const _handleAddToCart = (dog: Dog) => {
+  //   const isAlreadyInCart = cart.some(item => item.id === dog.id);
     
-    if (isAlreadyInCart) {
-      return;
-    }
+  //   if (isAlreadyInCart) {
+  //     return;
+  //   }
     
-    // Check if cart is empty before adding
-    const wasCartEmpty = cart.length === 0;
-    addToCart(dog);
+  //   // Check if cart is empty before adding
+  //   const wasCartEmpty = cart.length === 0;
+  //   addToCart(dog);
     
-    toast.success(`${dog.name} added to cart!`);
+  //   toast.success(`${dog.name} added to cart!`);
     
-    // Open cart if it was empty before adding
-    if (wasCartEmpty) {
-      setIsCartOpen(true);
-    }
-  };
+  //   // Open cart if it was empty before adding
+  //   if (wasCartEmpty) {
+  //     setIsCartOpen(true);
+  //   }
+  // };
   const cartTotal = cart.reduce((sum, item) => sum + item.price, 0);
   const tax = cartTotal * 0.07;
   const discount = cart.length >= 3 ? cartTotal * 0.1 : 0;
@@ -237,6 +237,7 @@ export const Home = ({ searchTerm, setSearchTerm }: HomeProps) => {
                   dog={dog}
                   isFavorite={favorites.includes(dog.id)}
                   onToggleFavorite={toggleFavorite}
+                  
                 />
               ))}
             </div>
