@@ -1,5 +1,6 @@
 import firebase from "firebase/compat/app";
 
+
 // types/user.ts
 export interface User {
   uid: string;
@@ -9,6 +10,7 @@ export interface User {
   cart: string[];          // Array of dog IDs in cart
   purchasedDocs: string[]; // Array of purchased document IDs
   createdAt: firebase.firestore.Timestamp;
+  updatedAt?: firebase.firestore.Timestamp;
 }
 
 // types/dog.ts
@@ -22,7 +24,6 @@ export interface Dog {
   images: string[];
   isAvailable: boolean;
   createdAt: firebase.firestore.Timestamp;
-  // Removed isFavorite from here - it should be user-specific
 }
 
 // types/order.ts
@@ -31,8 +32,11 @@ export interface Order {
   userId: string;
   items: string[]; // Dog IDs
   total: number;
+  paymentMethod: 'momo' | 'paypal' | 'card';
+  shippingAddress: string;
   status: 'pending' | 'completed' | 'cancelled';
-  createdAt: firebase.firestore.Timestamp;
+  createdAt: Date;
+  updatedAt: firebase.firestore.Timestamp;
 }
 
 // NEW: types/favorites.ts

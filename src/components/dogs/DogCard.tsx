@@ -4,8 +4,9 @@ import { Dog } from "../../types/user";
 import { useAuth } from "../../context/AuthContext";
 import { useState } from "react";
 import { removeFavorite, addFavorite } from "../../context/Favourite";
-import { useCart } from "../../context/CartContent";
+import { useCart } from "../../context/CartContext";
 import { toast } from "react-toastify";
+import { Cart } from "../cart/Cart";
 
 interface DogCardProps {
   dog: Dog;
@@ -14,16 +15,17 @@ interface DogCardProps {
   postedByAdmin?: string;
 }
 
-export const DogCard = ({ 
-  dog, 
-  isFavorite, 
+export const DogCard = ({
+  dog,
+  isFavorite,
   onToggleFavorite,
-  postedByAdmin 
+  postedByAdmin,
 }: DogCardProps) => {
   const { user } = useAuth();
   const { cart, addToCart, removeFromCart } = useCart();
   const [imageLoaded, setImageLoaded] = useState(false);
-  const isInCart = cart.some(item => item.id === dog.id);
+  const isInCart = cart.some((item) => item.id === dog.id);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   const handleToggleFavorite = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -46,16 +48,27 @@ export const DogCard = ({
 
   const handleCartAction = (e: React.MouseEvent) => {
     e.stopPropagation();
+    
     if (!dog.isAvailable) return;
 
     if (isInCart) {
       removeFromCart(dog.id);
       toast.success(`${dog.name} removed from cart`);
     } else {
+      const wasCartEmpty = cart.length === 0;
       addToCart(dog);
       toast.success(`${dog.name} added to cart!`);
+      if (wasCartEmpty) {
+        setIsCartOpen(true);
+      }
     }
   };
+
+  
+ 
+  const cartTotal = cart.reduce((sum, item) => sum + item.price, 0);
+  const tax = cartTotal * 0.07;
+  const discount = cart.length >= 3 ? cartTotal * 0.1 : 0;
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow relative group">
@@ -63,9 +76,9 @@ export const DogCard = ({
       <button
         onClick={handleToggleFavorite}
         className={`absolute top-3 right-3 z-10 p-2 rounded-full transition-all ${
-          isFavorite 
-            ? 'bg-red-100 text-red-500' 
-            : 'bg-white/80 text-gray-400 hover:text-red-500 backdrop-blur-sm'
+          isFavorite
+            ? "bg-red-100 text-red-500"
+            : "bg-white/80 text-gray-400 hover:text-red-500 backdrop-blur-sm"
         }`}
         aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
       >
@@ -95,7 +108,7 @@ export const DogCard = ({
           src={dog.images[0]}
           alt={dog.name}
           className={`w-full h-full object-cover transition-opacity ${
-            imageLoaded ? 'opacity-100' : 'opacity-0'
+            imageLoaded ? "opacity-100" : "opacity-0"
           }`}
           onLoad={() => setImageLoaded(true)}
         />
@@ -114,12 +127,14 @@ export const DogCard = ({
 
         <div className="flex justify-between items-center text-sm text-gray-600 mb-2">
           <span className="capitalize">{dog.breed.toLowerCase()}</span>
-          <span>Age: {dog.age} {dog.age === 1 ? 'yr' : 'yrs'}</span>
+          <span>
+            Age: {dog.age} {dog.age === 1 ? "yr" : "yrs"}
+          </span>
         </div>
 
         {dog.createdAt && (
           <div className="text-xs text-gray-500 mb-3">
-            Posted: {format(dog.createdAt.toDate(), 'MMM d, yyyy')}
+            Posted: {format(dog.createdAt.toDate(), "MMM d, yyyy")}
           </div>
         )}
 
@@ -133,19 +148,25 @@ export const DogCard = ({
             className={`px-4 py-2 rounded-lg transition-colors ${
               dog.isAvailable
                 ? isInCart
-                  ? 'bg-gray-300 text-gray-700 hover:bg-gray-400'
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  ? "bg-gray-300 text-gray-700 hover:bg-gray-400"
+                  : "bg-blue-600 text-white hover:bg-blue-700"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
           >
-            {dog.isAvailable 
-              ? isInCart 
-                ? 'Remove' 
-                : 'Add to Cart'
-              : 'Unavailable'}
+            {dog.isAvailable
+              ? isInCart
+                ? "Remove"
+                : "Add to Cart"
+              : "Unavailable"}
           </button>
         </div>
       </div>
+      <Cart
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        tax={tax}
+        discount={discount}
+      />
     </div>
   );
 };

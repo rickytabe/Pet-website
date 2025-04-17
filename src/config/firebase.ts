@@ -17,8 +17,11 @@ const firebaseConfig = {
 
 console.log("Firebase Config:", firebaseConfig); // Log the config to check if it's correct
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+export{auth, db};
+
 
 // const ADMIN_UID = "JoUFzMhWmTaDmQ6irgA3RHP1cml2"; 
 

@@ -58,6 +58,9 @@ export const Login = () => {
       }else if(error.message === 'Firebase: Error (auth/invalid-credential).'){
            setErrors({ general: "Invalid Email or Password. Please try again." });
            toast.error('Invalid Email or Password. Please try again.');
+      }else if (error.message === 'Firebase: Error (auth/network-request-failed).') {
+        setErrors({ general: "You are not connected to the internet. Check Your Internet Connection" });
+        toast.error('You are not connected to the internet.');
       } else {
         setErrors({ general: "Login failed. Please try again." });
         toast.error('Login failed. Please try again.');

@@ -1,17 +1,18 @@
 import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
-import { CartProvider, useCart } from "./context/CartContent";
+import { CartProvider, useCart } from "./context/CartContext";
 import { Home } from "./pages/public/Home";
 import { Login } from "./pages/public/Login";
 import { AdminDashboard } from "./pages/admin/AdminDashboard";
 import { Register } from "./pages/public/Register";
 import { ProtectedRoute } from "./components/common/ProtectedRoute";
-import { Profile } from "./pages/protected/Profile";
+import  Profile  from "./pages/protected/Profile";
 import { Cart } from "./components/cart/Cart";
 import { Footer } from "./components/layout/Footer";
 import { toast, ToastContainer } from "react-toastify";
 import { Navbar } from "./components/layout/Navbar";
+import { OrdersProvider } from "./context/OrderContext";
 
 export const App = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -46,6 +47,7 @@ export const App = () => {
       />
       <AuthProvider>
         <CartProvider>
+          <OrdersProvider>
           <div className="min-h-screen bg-gray-50 flex flex-col">
             <Navbar
               searchTerm={searchTerm}
@@ -95,6 +97,7 @@ export const App = () => {
 
             <Footer />
           </div>
+          </OrdersProvider >
         </CartProvider>
       </AuthProvider>
     </Router>

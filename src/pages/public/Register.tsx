@@ -98,6 +98,9 @@ export const Register = () => {
       } else if (error.message === 'Firebase: Error (auth/weak-password).') {
         setErrors({ general: "Password should be at least 6 characters." });
         toast.error('Password too weak.');
+      }else if (error.message === 'Firebase: Error (auth/network-request-failed).') {
+        setErrors({ general: "You are not connected to the internet. Check Your Network" });
+        toast.error('You are not connected to the internet.');
       } else {
         setErrors({ general: "Registration failed. Please try again." });
         toast.error('Registration failed. Please try again.');

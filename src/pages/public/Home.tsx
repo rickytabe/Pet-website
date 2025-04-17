@@ -8,7 +8,7 @@ import { collection, getDocs, query, where, getCountFromServer, doc, onSnapshot 
 import { db } from "../../config/firebase";
 import { Dog } from "../../types/user";
 import { toast } from "react-toastify";
-import { useCart } from "../../context/CartContent";
+import { useCart } from "../../context/CartContext";
 import { SearchBar } from "../../components/common/SearchBar";
 import { useAuth } from "../../context/AuthContext";
 
@@ -27,7 +27,7 @@ export const Home = ({ searchTerm, setSearchTerm }: HomeProps) => {
   const [totalResults, setTotalResults] = useState(0);
   const [showFavorites, setShowFavorites] = useState(false);
   const [favorites, setFavorites] = useState<string[]>([]);
-  const { cart } = useCart();
+  const { cart, } = useCart();
   const { user } = useAuth();
   const [priceFilter, setPriceFilter] = useState<{ min?: number; max?: number }>({});
 
@@ -97,8 +97,9 @@ export const Home = ({ searchTerm, setSearchTerm }: HomeProps) => {
         if (searchTerm) {
           toast.success(`Found ${filteredDogs.length} matching dogs`);
         }
-      } catch (error) {
+      } catch (error: any) {
         toast.error("Failed to load dogs");
+        console.log("This error occured: ", error.message)
       } finally {
         setLoading(false);
       }
@@ -119,24 +120,8 @@ export const Home = ({ searchTerm, setSearchTerm }: HomeProps) => {
     );
   };
 
-  // const _handleAddToCart = (dog: Dog) => {
-  //   const isAlreadyInCart = cart.some(item => item.id === dog.id);
-    
-  //   if (isAlreadyInCart) {
-  //     return;
-  //   }
-    
-  //   // Check if cart is empty before adding
-  //   const wasCartEmpty = cart.length === 0;
-  //   addToCart(dog);
-    
-  //   toast.success(`${dog.name} added to cart!`);
-    
-  //   // Open cart if it was empty before adding
-  //   if (wasCartEmpty) {
-  //     setIsCartOpen(true);
-  //   }
-  // };
+  
+
   const cartTotal = cart.reduce((sum, item) => sum + item.price, 0);
   const tax = cartTotal * 0.07;
   const discount = cart.length >= 3 ? cartTotal * 0.1 : 0;
@@ -236,8 +221,7 @@ export const Home = ({ searchTerm, setSearchTerm }: HomeProps) => {
                   key={dog.id}
                   dog={dog}
                   isFavorite={favorites.includes(dog.id)}
-                  onToggleFavorite={toggleFavorite}
-                  
+                  onToggleFavorite={toggleFavorite}                  
                 />
               ))}
             </div>
@@ -254,5 +238,6 @@ export const Home = ({ searchTerm, setSearchTerm }: HomeProps) => {
     </>
   );
 };
+
 
 
